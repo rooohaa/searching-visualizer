@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 const BarWrapper = styled.div`
-  background-color: #4FD1C5;
+  background-color: #4fd1c5;
   width: 100%;
   transition: height 0.3s ease-out;
   color: #fff;
@@ -16,6 +16,7 @@ interface BarProps {
 const Bar: React.FC<BarProps> = ({ value, dataVal }) => {
   return (
     <BarWrapper
+      className="app-bar"
       style={{
         height: `${value}px`,
       }}

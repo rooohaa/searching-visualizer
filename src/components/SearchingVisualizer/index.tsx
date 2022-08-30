@@ -9,7 +9,9 @@ const SearchingVisualizer: React.FC = () => {
   const [target, setTarget] = useState('');
   const [size, setSize] = useState(50);
   const [searchSpeed, setSearchSpeed] = useState(30);
-  const [foundIdx, setFoundIdx] = useState<number | null>(null);
+  const [foundIdxLin, setFoundIdxLin] = useState<number | null>(null);
+  const [foundIdxBin, setFoundIdxBin] = useState<number | null>(null);
+  const [stepsCountBin, setStepsCountBin] = useState(0);
 
   const generateArray = useCallback(() => {
     resetState();
@@ -40,12 +42,17 @@ const SearchingVisualizer: React.FC = () => {
     setSearchSpeed(+e.target.value);
   };
 
-  const doLinearSearch = () => {
+  const searchTarget = () => {
     if (!target) {
-      alert('Input target element');
+      alert('Input target element!');
       return;
     }
 
+    doBinarySearch();
+    doLinearSearch();
+  };
+
+  const doLinearSearch = () => {
     for (let i = 0; i < arr.length; i++) {
       const currElem = arr[i];
       const currBar = document.getElementById(
@@ -60,7 +67,7 @@ const SearchingVisualizer: React.FC = () => {
         } else {
           setTimeout(() => {
             currBar.style.backgroundColor = 'lime';
-            setFoundIdx(i);
+            setFoundIdxLin(i);
           }, searchSpeed * i);
 
           break;
@@ -69,13 +76,48 @@ const SearchingVisualizer: React.FC = () => {
     }
   };
 
-  const resetState = () => {
-    setFoundIdx(null);
+  const doBinarySearch = () => {
+    let i = 1;
+    let left = 0;
+    let right = sorted.length - 1;
 
-    const bars = document.querySelector('.bars-wrapper')?.children;
+    while (left <= right) {
+      const mid = Math.floor((left + right) / 2);
+      const currBar = document.getElementById(
+        `bn-${sorted[mid]}-${mid}`
+      )?.parentElement;
+
+      if (sorted[mid] === +target) {
+        setTimeout(() => {
+          currBar!.style.backgroundColor = 'lime';
+          setFoundIdxBin(mid);
+          setStepsCountBin(i);
+        }, size * i * 1.5);
+        break;
+      } else {
+        setTimeout(() => {
+          currBar!.style.backgroundColor = 'rgb(140, 98, 98)';
+        }, size * i * 1.5);
+      }
+
+      if (sorted[mid] > +target) {
+        right = mid - 1;
+      } else {
+        left = mid + 1;
+      }
+
+      i += 1;
+    }
+  };
+
+  const resetState = () => {
+    setFoundIdxLin(null);
+    setFoundIdxBin(null);
+
+    const bars = document.querySelectorAll('.app-bar');
 
     if (bars) {
-      Array.from(bars as HTMLCollectionOf<HTMLElement>).forEach(
+      Array.from(bars as NodeListOf<HTMLElement>).forEach(
         (bar) => (bar.style.backgroundColor = '#4FD1C5')
       );
     }
@@ -92,7 +134,7 @@ const SearchingVisualizer: React.FC = () => {
             <input
               type="range"
               value={size}
-              disabled={foundIdx !== null}
+              disabled={foundIdxLin !== null && foundIdxBin !== null}
               onChange={handleArrayResize}
               min="10"
               max="100"
@@ -125,9 +167,9 @@ const SearchingVisualizer: React.FC = () => {
               onChange={(e) => setTarget(e.target.value)}
             />
             <AppButton
-              disabled={foundIdx !== null}
+              disabled={foundIdxLin !== null && foundIdxBin !== null}
               variant="secondary"
-              onClick={doLinearSearch}
+              onClick={searchTarget}
             >
               Search
             </AppButton>
@@ -147,19 +189,15 @@ const SearchingVisualizer: React.FC = () => {
           <Wrapper>
             <div className="bars-header">
               <div className="search-name">Linear search</div>
-              {foundIdx !== null && (
+              {foundIdxLin !== null && (
                 <div className="search-result">
-                  Found at index {foundIdx} in {foundIdx + 1} steps
+                  Found at index {foundIdxLin} in {foundIdxLin + 1} steps
                 </div>
               )}
             </div>
             <div className="bars-wrapper">
               {arr.map((val, idx) => (
-                <Bar
-                  key={idx}
-                  value={val}
-                  dataVal={`ln-${val}-${idx}`}
-                />
+                <Bar key={idx} value={val} dataVal={`ln-${val}-${idx}`} />
               ))}
             </div>
           </Wrapper>
@@ -167,15 +205,17 @@ const SearchingVisualizer: React.FC = () => {
           <Wrapper>
             <div className="bars-header">
               <div className="search-name">Binary search</div>
+
+              {foundIdxBin !== null && (
+                <div className="search-result">
+                  Found at index {foundIdxBin} in {stepsCountBin} steps
+                </div>
+              )}
             </div>
 
             <div className="bars-wrapper">
               {sorted.map((val, idx) => (
-                <Bar
-                  key={idx}
-                  value={val}
-                  dataVal={`bn-${val}-${idx}`}
-                />
+                <Bar key={idx} value={val} dataVal={`bn-${val}-${idx}`} />
               ))}
             </div>
           </Wrapper>
