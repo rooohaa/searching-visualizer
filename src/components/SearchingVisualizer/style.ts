@@ -5,7 +5,10 @@ export const Wrapper = styled.div`
   background-color: #2d3748;
   width: 100%;
   border-radius: 9px;
+
+  // temporary solution
   height: 320px;
+  overflow-y: auto;
 
   display: flex;
   flex-direction: column;
@@ -40,7 +43,7 @@ export const Wrapper = styled.div`
 
 export const ActionsWrapper = styled.div`
   width: 100%;
-  padding: 10px 15px;
+  padding: 10px 30px;
   background-color: #2d3748;
 
   display: flex;
@@ -67,7 +70,6 @@ export const ActionsWrapper = styled.div`
         border-radius: 4px;
         padding: 8px;
         border: none;
-        outline: none;
       }
     }
   }

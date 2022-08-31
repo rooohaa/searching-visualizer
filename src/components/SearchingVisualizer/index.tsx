@@ -1,17 +1,21 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { notTargetColor, targetColor } from '../../constants';
 import { randomIntFromInterval } from '../../utils';
 import { AppButton } from '../AppButton';
 import { Bar } from '../Bar';
+import { InputArray } from '../InputArray';
 import { ActionsWrapper, Wrapper } from './style';
 
 const SearchingVisualizer: React.FC = () => {
   const [arr, setArr] = useState<number[]>([]);
   const [target, setTarget] = useState('');
-  const [size, setSize] = useState(50);
+  const [size, setSize] = useState(75);
   const [searchSpeed, setSearchSpeed] = useState(30);
   const [foundIdxLin, setFoundIdxLin] = useState<number | null>(null);
   const [foundIdxBin, setFoundIdxBin] = useState<number | null>(null);
   const [stepsCountBin, setStepsCountBin] = useState(0);
+
+  useEffect(() => console.log(arr), [arr]);
 
   const generateArray = useCallback(() => {
     resetState();
@@ -62,11 +66,11 @@ const SearchingVisualizer: React.FC = () => {
       if (currBar) {
         if (currElem !== +target) {
           setTimeout(() => {
-            currBar.style.backgroundColor = 'rgb(140, 98, 98)';
+            currBar.style.backgroundColor = notTargetColor;
           }, searchSpeed * i);
         } else {
           setTimeout(() => {
-            currBar.style.backgroundColor = 'lime';
+            currBar.style.backgroundColor = targetColor;
             setFoundIdxLin(i);
           }, searchSpeed * i);
 
@@ -89,15 +93,15 @@ const SearchingVisualizer: React.FC = () => {
 
       if (sorted[mid] === +target) {
         setTimeout(() => {
-          currBar!.style.backgroundColor = 'lime';
+          currBar!.style.backgroundColor = targetColor;
           setFoundIdxBin(mid);
           setStepsCountBin(i);
-        }, size * i * 1.5);
+        }, size * i * 1.7);
         break;
       } else {
         setTimeout(() => {
-          currBar!.style.backgroundColor = 'rgb(140, 98, 98)';
-        }, size * i * 1.5);
+          currBar!.style.backgroundColor = notTargetColor;
+        }, size * i * 1.7);
       }
 
       if (sorted[mid] > +target) {
@@ -137,7 +141,7 @@ const SearchingVisualizer: React.FC = () => {
               disabled={foundIdxLin !== null && foundIdxBin !== null}
               onChange={handleArrayResize}
               min="10"
-              max="100"
+              max="150"
             />
           </div>
 
@@ -155,10 +159,6 @@ const SearchingVisualizer: React.FC = () => {
         </div>
 
         <div className="app-controls">
-          <AppButton variant="primary" onClick={generateArray}>
-            Generate new array
-          </AppButton>
-
           <div className="app-search-input">
             <input
               type="text"
@@ -183,9 +183,17 @@ const SearchingVisualizer: React.FC = () => {
             display: 'flex',
             flexDirection: 'column',
             rowGap: '20px',
-            margin: '20px 0',
+            margin: '5px 0',
           }}
         >
+          <InputArray
+            onGenerateClick={generateArray}
+            onSetArray={(arr) => {
+              resetState();
+              setArr(arr);
+            }}
+          />
+
           <Wrapper>
             <div className="bars-header">
               <div className="search-name">Linear search</div>
