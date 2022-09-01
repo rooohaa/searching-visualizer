@@ -15,8 +15,6 @@ const SearchingVisualizer: React.FC = () => {
   const [foundIdxBin, setFoundIdxBin] = useState<number | null>(null);
   const [stepsCountBin, setStepsCountBin] = useState(0);
 
-  useEffect(() => console.log(arr), [arr]);
-
   const generateArray = useCallback(() => {
     resetState();
 
